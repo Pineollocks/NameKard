@@ -1,0 +1,2 @@
+# NameKard
+AI lead scraper 

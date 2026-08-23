@@ -201,7 +201,7 @@ export default function LeadDashboard() {
     setLeads([]);
 
     try {
-      const response = await fetch("http://localhost:8000/api/leads/search", {
+      const response = await fetch("https://namekard.onrender.com/api/leads/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

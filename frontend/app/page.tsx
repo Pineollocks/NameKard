@@ -162,20 +162,25 @@ function LeadsTable({
 }
 
 // ── Main page ──────────────────────────────────────────────────────────────
+const BACKEND = "https://namekard.onrender.com";
+
 export default function LeadDashboard() {
   const [description, setDescription] = useState("");
   const [numLeads, setNumLeads] = useState(3);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSlow, setIsSlow] = useState(false);
   const [error, setError] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [savedLeads, setSavedLeads] = useState<Lead[]>([]);
   const [excludeSaved, setExcludeSaved] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
 
-  // Load saved leads from localStorage on mount
+  // Load saved leads from localStorage on mount, and ping the backend
+  // so Render's cold-start completes before the user hits Search.
   useEffect(() => {
     setSavedLeads(loadSaved());
+    fetch(`${BACKEND}/`).catch(() => {});
   }, []);
 
   const toggleSave = (lead: Lead) => {
@@ -197,11 +202,15 @@ export default function LeadDashboard() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setIsSlow(false);
     setError("");
     setLeads([]);
 
+    // Show a "taking a while" hint after 15 s (Render cold-start / heavy scrape)
+    const slowTimer = setTimeout(() => setIsSlow(true), 15000);
+
     try {
-      const response = await fetch("https://namekard.onrender.com/api/leads/search", {
+      const response = await fetch(`${BACKEND}/api/leads/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -221,7 +230,9 @@ export default function LeadDashboard() {
     } catch (err: any) {
       setError(err.message);
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setIsSlow(false);
     }
   };
 
@@ -392,6 +403,11 @@ export default function LeadDashboard() {
                   <div className="flex flex-col items-center justify-center py-16 animate-in fade-in duration-300">
                     <div className="h-8 w-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mb-4" />
                     <p className="text-sm text-neutral-400">Scraping & discovering leads with AI...</p>
+                    {isSlow && (
+                      <p className="text-xs text-neutral-500 mt-2 animate-in fade-in duration-500">
+                        This is taking a while — the server may be warming up. Hang tight...
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -401,6 +417,11 @@ export default function LeadDashboard() {
                     <p className="text-sm text-neutral-500 mb-3">
                       {leads.length} lead{leads.length !== 1 ? "s" : ""} found — ☆ to save
                     </p>
+                    {leads.length < numLeads && (
+                      <div className="bg-amber-950/40 border border-amber-800/50 text-amber-400 text-sm px-4 py-2.5 rounded-md mb-3">
+                        Only {leads.length} of {numLeads} leads found — try broadening your search description.
+                      </div>
+                    )}
                     <LeadsTable
                       leads={leads}
                       savedLeads={savedLeads}

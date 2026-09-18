@@ -10,7 +10,7 @@ interface Lead {
   website: string;
 }
 
-// ── helpers ────────────────────────────────────────────────────────────────
+// helpers 
 const LS_KEY = "namekard-saved-leads";
 
 function normalizeUrl(url: string): string {
@@ -52,7 +52,7 @@ function triggerDownload(csv: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-// ── icons ──────────────────────────────────────────────────────────────────
+// icons
 const StarIcon = ({ filled }: { filled: boolean }) => (
   <svg
     className={`w-4 h-4 transition-colors ${filled ? "fill-emerald-400 text-emerald-400" : "fill-none text-neutral-500 hover:text-emerald-400"}`}
@@ -78,7 +78,7 @@ const TrashIcon = () => (
   </svg>
 );
 
-// ── LeadRow ────────────────────────────────────────────────────────────────
+// LeadRow
 function LeadRow({
   lead, saved, onToggleSave,
 }: {
@@ -114,7 +114,7 @@ function LeadRow({
   );
 }
 
-// ── LeadsTable ─────────────────────────────────────────────────────────────
+// LeadsTable 
 function LeadsTable({
   leads, savedLeads, onToggleSave, onDownload, downloadLabel,
 }: {
@@ -161,7 +161,7 @@ function LeadsTable({
   );
 }
 
-// ── Main page ──────────────────────────────────────────────────────────────
+//  Main page 
 const BACKEND = "https://namekard.onrender.com";
 
 export default function LeadDashboard() {
@@ -242,7 +242,7 @@ export default function LeadDashboard() {
   return (
     <div className="flex h-screen bg-neutral-950 text-neutral-200 overflow-hidden">
 
-      {/* 1. The Fixed Sidebar */}
+      {/* Fixed Sidebar */}
       <aside className="w-64 border-r border-neutral-800 bg-neutral-950 flex flex-col p-6 shrink-0">
         <div className="text-2xl font-bold text-neutral-100 mb-10">NameKard</div>
 
@@ -279,7 +279,7 @@ export default function LeadDashboard() {
         </nav>
       </aside>
 
-      {/* 2. The Scrollable Main Content */}
+      {/* Scrollable Main Content */}
       <main className="flex-1 overflow-y-auto p-8 flex flex-col">
         <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col">
 

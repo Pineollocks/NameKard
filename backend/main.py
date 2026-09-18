@@ -30,7 +30,7 @@ async def root():
 @app.post("/api/leads/extract", response_model=List[Lead])
 async def extract_leads(url: str):
     """
-    Scrapes a URL and uses Gemini to extract structured business lead data.
+    scrapes a URL and uses Gemini to extract data
     """
     raw_text = scrape_website_text(url)
     if not raw_text:
@@ -60,11 +60,10 @@ async def search_and_extract_leads(request: SearchRequest):
     Takes a description and a desired number of leads, searches the web,
     scrapes sites, and stops once the requested number is reached.
     """
-    # Build a set of excluded domains from the saved leads list
+    # excluded domains from the saved leads list
     excluded_domains = {_get_domain(w) for w in request.excluded_websites if w}
 
     # Use a larger pool: 4x the requested leads (minimum 20) to account for
-    # failed scrapes, bot blocks, and pages with no contact info
     search_pool_size = max(request.num_leads * 4, 20)
     urls = search_company_urls(request.description, max_results=search_pool_size)
 
@@ -75,7 +74,6 @@ async def search_and_extract_leads(request: SearchRequest):
     seen_domains: set = set()
 
     for url in urls:
-        # Stop early if we've hit our target
         if len(all_leads) >= request.num_leads:
             break
 
@@ -109,5 +107,4 @@ async def search_and_extract_leads(request: SearchRequest):
             if len(all_leads) >= request.num_leads:
                 break
 
-    # Return exactly the requested amount, or whatever maximum we managed to find
     return all_leads[:request.num_leads]
